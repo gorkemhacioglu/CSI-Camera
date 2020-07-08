@@ -1,26 +1,15 @@
-# MIT License
-# Copyright (c) 2019 JetsonHacks
-# See LICENSE for OpenCV license and additional information
-
-# https://docs.opencv.org/3.3.1/d7/d8b/tutorial_py_face_detection.html
-# On the Jetson Nano, OpenCV comes preinstalled
-# Data files are in /usr/sharc/OpenCV
+import time
+import serial
 import numpy as np
 import cv2
-
-# gstreamer_pipeline returns a GStreamer pipeline for capturing from the CSI camera
-# Defaults to 1280x720 @ 30fps
-# Flip the image by setting the flip_method (most common values: 0 and 2)
-# display_width and display_height determine the size of the window on the screen
-
 
 def gstreamer_pipeline(
     capture_width=3280,
     capture_height=2464,
     display_width=820,
     display_height=616,
-    framerate=21,
-    flip_method=0,
+    framerate=6,
+    flip_method=2,
 ):
     return (
         "nvarguscamerasrc ! "
@@ -51,24 +40,46 @@ def face_detect():
     )
     cap = cv2.VideoCapture(gstreamer_pipeline(), cv2.CAP_GSTREAMER)
     if cap.isOpened():
+        prevtime = time.time()
+        facedetectedtime = prevtime
         cv2.namedWindow("Face Detect", cv2.WINDOW_AUTOSIZE)
         while cv2.getWindowProperty("Face Detect", 0) >= 0:
             ret, img = cap.read()
             gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
             faces = face_cascade.detectMultiScale(gray, 1.3, 5)
-
             for (x, y, w, h) in faces:
-                cv2.rectangle(img, (x, y), (x + w, y + h), (255, 0, 0), 2)
-                roi_gray = gray[y : y + h, x : x + w]
-                roi_color = img[y : y + h, x : x + w]
-                eyes = eye_cascade.detectMultiScale(roi_gray)
-                for (ex, ey, ew, eh) in eyes:
-                    cv2.rectangle(
-                        roi_color, (ex, ey), (ex + ew, ey + eh), (0, 255, 0), 2
-                    )
-
+				facedetectedtime = time.time()
+				if(x> 370):
+					serial_port.write('1'.encode())
+					print("Right")
+				elif(x <290):
+					serial_port.write('0'.encode())
+					print("Left")
+					
+				if(y> 260):
+					serial_port.write('2'.encode())
+					print("Down")
+				elif(y <190):
+					serial_port.write('3'.encode())
+					print("Up")
+                
+				cv2.rectangle(img, (x, y), (x + w, y + h), (255, 0, 0), 2)
+				roi_gray = gray[y : y + h, x : x + w]
+				roi_color = img[y : y + h, x : x + w]
+				eyes = eye_cascade.detectMultiScale(roi_gray)
+				for (ex, ey, ew, eh) in eyes:
+					cv2.rectangle(
+						roi_color, (ex, ey), (ex + ew, ey + eh), (0, 255, 0), 2
+					)
+			
             cv2.imshow("Face Detect", img)
             keyCode = cv2.waitKey(30) & 0xFF
+            if(len(faces) == 0):
+				now = time.time()
+				if(now-prevtime > 2 and now-facedetectedtime >4):
+					print("start scan")
+					serial_port.write('9'.encode())
+					prevtime = now
             # Stop the program on the ESC key
             if keyCode == 27:
                 break
@@ -80,4 +91,11 @@ def face_detect():
 
 
 if __name__ == "__main__":
-    face_detect()
+	serial_port = serial.Serial(
+		port="/dev/ttyTHS1",
+		baudrate=4800,
+		bytesize=serial.EIGHTBITS,
+		parity=serial.PARITY_NONE,
+		stopbits=serial.STOPBITS_ONE,)
+	time.sleep(1)
+	face_detect()
