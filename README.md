@@ -37,9 +37,6 @@ $ gst-launch-1.0 nvarguscamerasrc sensor_id=1 ! \
 
 Also, it's been noticed that the display transform is sensitive to width and height (in the above example, width=816, height=616). If you experience issues, check to see if your display width and height is the same ratio as the camera frame size selected (In the above example, 816x616 is 1/4 the size of 3264x2464).
 ```
-
-There are several examples:
-
 Note: You may need to install numpy for the Python examples to work, ie $ pip3 install numpy
 
 face_detect.py is a python script which reads from the camera and uses  Haar Cascades to detect faces and eyes:
