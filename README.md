@@ -42,10 +42,6 @@ There are several examples:
 
 Note: You may need to install numpy for the Python examples to work, ie $ pip3 install numpy
 
-simple_camera.py is a Python script which reads from the camera and displays to a window on the screen using OpenCV:
-
-$ python simple_camera.py
-
 face_detect.py is a python script which reads from the camera and uses  Haar Cascades to detect faces and eyes:
 
 $ python face_detect.py
@@ -53,20 +49,6 @@ $ python face_detect.py
 Haar Cascades is a machine learning based approach where a cascade function is trained from a lot of positive and negative images. The function is then used to detect objects in other images. 
 
 See: https://docs.opencv.org/3.3.1/d7/d8b/tutorial_py_face_detection.html 
-
-The third example is a simple C++ program which reads from the camera and displays to a window on the screen using OpenCV:
-
-```
-$ g++ -std=c++11 -Wall -I/usr/lib/opencv simple_camera.cpp -L/usr/lib -lopencv_core -lopencv_highgui -lopencv_videoio -o simple_camera
-
-$ ./simple_camera
-```
-
-The final example is dual_camera.py. This example is for the newer rev B01 of the Jetson Nano board, identifiable by two CSI-MIPI camera ports. This is a simple Python program which reads both CSI cameras and displays them in a window. The window is 960x1080. For performance, the script uses a separate thread for reading each camera image stream. To run the script:
-
-```
-$ python3 dual_camera.py
-```
 
 The directory 'instrumented' contains instrumented code which can help adjust performance and frame rates.
 
